@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+//RF - 01 REGISTRO DE USUARIOS 
 @Table(name = "usuarios")
 public class Usuarios {
 
