@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class Prestamo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // RF-09: Asociar un libro con un usuario

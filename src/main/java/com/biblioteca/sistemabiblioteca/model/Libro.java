@@ -1,8 +1,8 @@
 package com.biblioteca.sistemabiblioteca.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+//import jakarta.persistence.GeneratedValue;
+//import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 public class Libro {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // El ID se genera solo (1, 2, 3...)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY) // El ID se genera solo (1, 2, 3...)
 
     private Long id;
     private String titulo;
