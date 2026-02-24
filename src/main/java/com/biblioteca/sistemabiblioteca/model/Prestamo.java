@@ -4,35 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-// RF - 09
 @Table(name = "prestamos")
 public class Prestamo {
-
-    @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    // RF-09: Asociar un libro con un usuario
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private Usuarios usuario;
-
-    @ManyToOne
-    @JoinColumn(name = "libro_id")
-    private Libro libro;
-
-    // RF-09: Registrar fechas de préstamo y devolución esperada
-    private LocalDate fechaPrestamo;
-    private LocalDate fechaDevolucionEsperada;
-
-    // RF-10: Registrar fecha real de devolución
-    private LocalDate fechaDevolucionReal;
-
-    // RF-11: Para listar activos, vencidos o devueltos
-    private String estado; // Ejemplo: "ACTIVO", "DEVUELTO", "VENCIDO"
-
-    // RF-10: Para el cálculo opcional de multas
-    private Double multa;
 
     public Long getId() {
         return id;
@@ -40,14 +13,6 @@ public class Prestamo {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Usuarios getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuarios usuario) {
-        this.usuario = usuario;
     }
 
     public Libro getLibro() {
@@ -58,36 +23,44 @@ public class Prestamo {
         this.libro = libro;
     }
 
-    public LocalDate getFechaPrestamo() {
+    public Usuarios getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuarios usuario) {
+        this.usuario = usuario;
+    }
+
+    public Usuarios getBibliotecario() {
+        return bibliotecario;
+    }
+
+    public void setBibliotecario(Usuarios bibliotecario) {
+        this.bibliotecario = bibliotecario;
+    }
+
+    public java.time.LocalDateTime getFechaPrestamo() {
         return fechaPrestamo;
     }
 
-    public void setFechaPrestamo(LocalDate fechaPrestamo) {
+    public void setFechaPrestamo(java.time.LocalDateTime fechaPrestamo) {
         this.fechaPrestamo = fechaPrestamo;
     }
 
-    public LocalDate getFechaDevolucionEsperada() {
+    public java.time.LocalDate getFechaDevolucionEsperada() {
         return fechaDevolucionEsperada;
     }
 
-    public void setFechaDevolucionEsperada(LocalDate fechaDevolucionEsperada) {
+    public void setFechaDevolucionEsperada(java.time.LocalDate fechaDevolucionEsperada) {
         this.fechaDevolucionEsperada = fechaDevolucionEsperada;
     }
 
-    public LocalDate getFechaDevolucionReal() {
+    public java.time.LocalDateTime getFechaDevolucionReal() {
         return fechaDevolucionReal;
     }
 
-    public void setFechaDevolucionReal(LocalDate fechaDevolucionReal) {
+    public void setFechaDevolucionReal(java.time.LocalDateTime fechaDevolucionReal) {
         this.fechaDevolucionReal = fechaDevolucionReal;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
     }
 
     public Double getMulta() {
@@ -98,4 +71,43 @@ public class Prestamo {
         this.multa = multa;
     }
 
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_prestamo")
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "isbn") // Se une por el ISBN del libro según el SQL
+    private Libro libro;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario") // Usuario que recibe el libro
+    private Usuarios usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "id_bibliotecario_entrega") // Cumple RF-09: Quién registra el préstamo
+    private Usuarios bibliotecario;
+
+    @Column(name = "fecha_salida")
+    private java.time.LocalDateTime fechaPrestamo; // Automática según SQL
+
+    @Column(name = "fecha_devolucion_esperada")
+    private java.time.LocalDate fechaDevolucionEsperada; // RF-09: 7-15 días
+
+    @Column(name = "fecha_devolucion_real")
+    private java.time.LocalDateTime fechaDevolucionReal; // RF-10: Registro real
+
+    @Column(name = "monto_multa_generado")
+    private Double multa;
+
+    @Column(name = "estado_prestamo")
+    private String estado; // 'Activo', 'Devuelto', 'En Moroso' según SQL
 }
