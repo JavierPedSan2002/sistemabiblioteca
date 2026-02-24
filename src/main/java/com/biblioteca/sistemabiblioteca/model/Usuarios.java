@@ -4,26 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-//RF - 01 REGISTRO DE USUARIOS 
 @Table(name = "usuarios")
 public class Usuarios {
-
-    @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String nombreCompleto;
-
-    @Column(unique = true)
-    private String correoElectronico;
-
-    private String tipoUsuario; // Estudiante, Profesor, Administrativo
-
-    private LocalDate fechaRegistro;
-
-    private String estado; // Activo/Inactivo
-
-    // SETTERS AND GETTERS
 
     public Long getId() {
         return id;
@@ -49,29 +31,59 @@ public class Usuarios {
         this.correoElectronico = correoElectronico;
     }
 
-    public String getTipoUsuario() {
-        return tipoUsuario;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setTipoUsuario(String tipoUsuario) {
-        this.tipoUsuario = tipoUsuario;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
-    public LocalDate getFechaRegistro() {
+    public Integer getIdRol() {
+        return idRol;
+    }
+
+    public void setIdRol(Integer idRol) {
+        this.idRol = idRol;
+    }
+
+    public java.time.LocalDateTime getFechaRegistro() {
         return fechaRegistro;
     }
 
-    public void setFechaRegistro(LocalDate fechaRegistro) {
+    public void setFechaRegistro(java.time.LocalDateTime fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
     }
 
-    public String getEstado() {
+    public Boolean getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(Boolean estado) {
         this.estado = estado;
     }
 
-    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario")
+    private Long id;
+
+    @Column(name = "nombre_completo", nullable = false)
+    private String nombreCompleto;
+
+    @Column(name = "correo_electronico", unique = true, nullable = false)
+    private String correoElectronico;
+
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash; // Requerimiento RF-01: Contraseña encriptada
+
+    @Column(name = "id_rol")
+    private Integer idRol; // Conecta con la tabla 'roles' (1=Estudiante, 2=Profesor, 3=Bibliotecario)
+
+    @Column(name = "fecha_registro", updatable = false)
+    private java.time.LocalDateTime fechaRegistro;
+
+    private Boolean estado; // TRUE = Activo, FALSE = Inactivo
+
+    // No olvides actualizar tus GETTERS y SETTERS para estos nuevos campos
 }
