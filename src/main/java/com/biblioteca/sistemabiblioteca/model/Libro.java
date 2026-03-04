@@ -1,34 +1,50 @@
 package com.biblioteca.sistemabiblioteca.model;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * CAPA DE MODELO: ENTIDAD LIBRO
+ * Esta clase representa la tabla 'libros' en la base de datos. 
+ * Es un POJO (Plain Old Java Object) que utiliza JPA para el mapeo objeto-relacional (ORM).
+ */
 @Entity
 @Table(name = "libros")
 public class Libro {
 
+    /**
+     * @Id: Define el ISBN como la llave primaria natural de la tabla.
+     * Se ha configurado con una longitud de 20 caracteres para cumplir con los estándares internacionales de ISBN-10 y ISBN-13.
+     */
     @Id
     @Column(name = "id_libro", length = 20)
-    private String isbn; // El ISBN ahora es el ID principal según el SQL
+    private String isbn; 
 
+    @Column(nullable = false)
     private String titulo;
+
     private String autor;
     private String editorial;
 
+    /**
+     * @Column: Sincroniza el nombre del atributo en Java con la columna física en MySQL.
+     */
     @Column(name = "anio_publicacion")
     private int anioPublicacion;
 
     @Column(name = "categoria")
-    private String categoria; // Cambiado de 'genero' a 'categoria' para igualar el SQL
+    private String categoria; 
 
     @Column(name = "copias_disponibles")
     private int copiasDisponibles;
 
     @Column(name = "ubicacion_estanteria")
     private String ubicacionEstanteria;
+
+    // --- MÉTODOS DE ACCESO (GETTERS Y SETTERS) ---
+    // Permiten la encapsulación de los datos y su correcta manipulación por los frameworks.
 
     public String getIsbn() {
         return isbn;
@@ -93,6 +109,4 @@ public class Libro {
     public void setUbicacionEstanteria(String ubicacionEstanteria) {
         this.ubicacionEstanteria = ubicacionEstanteria;
     }
-
-    // Actualiza tus Getters y Setters para estos nuevos nombres
 }
