@@ -16,15 +16,20 @@ public interface PrestamoRepository extends JpaRepository<Prestamo, Long> {
     /**
      * RF-11: FILTRADO POR ESTADO
      * Proporciona una lista de préstamos según su situación actual ('Activo', 'Devuelto', 'Moroso').
-     * Este método es vital para alimentar los dashboards de control en tiempo real.
      */
-    List<Prestamo> findByEstado(String estado);
+    List<Prestamo> findByEstadoPrestamo(String estadoPrestamo);
     
     /**
      * RF-09: VALIDACIÓN DE LÍMITE DE PRÉSTAMOS
-     * Implementa una consulta derivada que cuenta los registros activos de un usuario específico.
-     * Es la base técnica para la regla de negocio que impide que un alumno retire más de 3 libros
-     * simultáneamente, garantizando una distribución equitativa del acervo.
+     * Cuenta los registros donde la fecha de devolución real es nula.
+     * Si la fecha es null, significa que el usuario aún tiene el libro en su poder.
+     * Esta es la validación técnica para la regla de máximo 3 libros.
      */
-    long countByUsuarioIdAndEstado(Long idUsuario, String estado);
+    long countByUsuarioIdAndFechaDevolucionRealIsNull(Long idUsuario);
+
+    /**
+     * BÚSQUEDA POR USUARIO
+     * Permite obtener el historial completo de préstamos de un socio específico.
+     */
+    List<Prestamo> findByUsuarioId(Long idUsuario);
 }

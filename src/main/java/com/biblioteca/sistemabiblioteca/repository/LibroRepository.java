@@ -1,21 +1,38 @@
 package com.biblioteca.sistemabiblioteca.repository;
 
+import com.biblioteca.sistemabiblioteca.model.Libro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.biblioteca.sistemabiblioteca.model.Libro;
+import java.util.List;
 
 /**
  * CAPA DE REPOSITORIO: INTERFAZ DE PERSISTENCIA PARA LIBROS
- * Esta interfaz hereda de JpaRepository, proporcionando todos los métodos CRUD 
- * necesarios (Crear, Leer, Actualizar, Borrar) sin necesidad de implementar SQL manual.
+ * Proporciona acceso a la base de datos MySQL mediante Spring Data JPA.
  */
 @Repository
 public interface LibroRepository extends JpaRepository<Libro, String> { 
-    
+
     /**
-     * CONFIGURACIÓN DE LLAVE PRIMARIA:
-     * Se define el segundo parámetro como 'String' debido a que el modelo 'Libro' 
-     * utiliza el ISBN como identificador único y llave primaria (@Id).
+     * RF-06: BÚSQUEDA POR TÍTULO
+     * Permite encontrar libros aunque el usuario no escriba el nombre completo (Like).
      */
+    List<Libro> findByTituloContainingIgnoreCase(String titulo);
+
+    /**
+     * RF-06: BÚSQUEDA POR AUTOR
+     * Filtra el catálogo por el nombre del escritor.
+     */
+    List<Libro> findByAutorContainingIgnoreCase(String autor);
+
+    /**
+     * RF-07: FILTRADO POR CATEGORÍA
+     * Útil para agrupar libros del mismo género (Novela, Ciencia, etc.).
+     */
+    List<Libro> findByCategoria(String categoria);
+
+    /**
+     * VALIDACIÓN DE EXISTENCIA
+     * Método interno para verificar si un ISBN ya está registrado.
+     */
+    boolean existsByIsbn(String isbn);
 }

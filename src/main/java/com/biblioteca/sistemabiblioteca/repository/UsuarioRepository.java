@@ -8,34 +8,38 @@ import java.util.List;
 
 /**
  * REPOSITORIO DE GESTIÓN DE USUARIOS
- * Esta interfaz abstrae la comunicación con la tabla 'usuarios' en MySQL.
- * Proporciona métodos de búsqueda personalizados para cumplir con la lógica
- * de seguridad y administración de perfiles (RF-01 al RF-04).
  */
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuarios, Long> {
 
     /**
      * RF-01: VALIDACIÓN DE IDENTIDAD ÚNICA
-     * Busca un usuario por su correo electrónico. Se utiliza un 'Optional' para 
-     * manejar de forma segura la posibilidad de que el correo no exista en la base de datos, 
-     * evitando errores de puntero nulo (NullPointerException).
+     * Vital para el proceso de registro y login.
      */
     Optional<Usuarios> findByCorreoElectronico(String correoElectronico);
 
     /**
-     * RF-03: FILTRADO POR DISPONIBILIDAD
-     * Recupera una lista de usuarios basada en su estado lógico (Activo/Inactivo).
-     * Es esencial para restringir operaciones de préstamo a usuarios que han sido 
-     * dados de baja temporalmente.
+     * RF-02: BÚSQUEDA POR NOMBRE (MEJORADA)
+     * El 'Containing' permite buscar coincidencias parciales (ej: busca "Juan" y encuentra "Juan Perez").
+     * El 'IgnoreCase' ignora mayúsculas/minúsculas.
+     */
+    List<Usuarios> findByNombreContainingIgnoreCase(String nombre);
+
+    /**
+     * RF-03: FILTRADO POR ESTADO
+     * Ideal para el método listarActivos() del Service.
      */
     List<Usuarios> findByEstado(Boolean estado);
 
     /**
+     * RF-04: VERIFICACIÓN DE EXISTENCIA
+     * Útil para validaciones rápidas antes de operaciones pesadas.
+     */
+    boolean existsByCorreoElectronico(String correoElectronico);
+
+    /**
      * GESTIÓN DE PRIVILEGIOS POR ROL
-     * Filtra a los usuarios según su nivel de acceso (1=Estudiante, 2=Profesor, 3=Bibliotecario).
-     * Permite al sistema segmentar la información y las funcionalidades que se muestran 
-     * en la interfaz de usuario.
+     * Nota: Asegúrate de que en tu clase Usuarios el campo se llame idRol.
      */
     List<Usuarios> findByIdRol(Integer idRol);
 }
