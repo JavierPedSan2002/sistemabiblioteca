@@ -1,24 +1,24 @@
-
 CREATE DATABASE biblioteca_universidad;
 USE biblioteca_universidad;
 
 -- 1. Tabla de Roles para manejar los tipos de usuario y permisos
 CREATE TABLE roles (
-    id_rol SERIAL PRIMARY KEY,
+    id_rol int PRIMARY KEY auto_increment,
     nombre_rol VARCHAR(50) UNIQUE NOT NULL -- 'Estudiante', 'Profesor', 'Bibliotecario', 'SuperAdmin'
 );
 
 -- 2. Tabla de Usuarios (RF-01 a RF-04)
 CREATE TABLE usuarios (
-    id_usuario SERIAL PRIMARY KEY,
+    id_usuario int PRIMARY KEY auto_increment,
     nombre_completo VARCHAR(150) NOT NULL,
     correo_electronico VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    id_rol INT REFERENCES roles(id_rol),
+    id_rol INT,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE, -- TRUE = Activo, FALSE = Inactivo 
-    score_deuda DECIMAL(10,2) DEFAULT 0.00,
-    fotografia_url VARCHAR(255) -- Requerimiento de identificación vigente
+    #score_deuda DECIMAL(10,2) DEFAULT 0.00,
+    fotografia_url VARCHAR(255), -- Requerimiento de identificación vigente
+	foreign key(id_Rol) REFERENCES roles(id_rol)
 );
 
 -- 3. Tabla de Libros (RF-05 a RF-08)
@@ -29,23 +29,26 @@ CREATE TABLE libros (
     editorial VARCHAR(100),
     anio_publicacion INT,
     categoria VARCHAR(100),
-    copias_disponibles INT NOT NULL CHECK (copias_disponibles >= 0),
+    copias_disponibles INT NOT NULL default 3,
     ubicacion_estanteria VARCHAR(50)
 );
 
 -- 4. Tabla de Préstamos 
 CREATE TABLE prestamos (
-    id_prestamo SERIAL PRIMARY KEY,
-    isbn VARCHAR(20) REFERENCES libros(id_libro),
-    id_usuario INT REFERENCES usuarios(id_usuario),
+    id_prestamo int PRIMARY KEY auto_increment,
+    id_libro VARCHAR(20) REFERENCES libros(id_libro),
+    id_usuario INT,
     id_bibliotecario_entrega INT REFERENCES usuarios(id_usuario), -- Solo Bibliotecario/Admin
     fecha_salida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_devolucion_esperada DATE NOT NULL,
     fecha_devolucion_real TIMESTAMP,
     monto_multa_generado DECIMAL(10,2) DEFAULT 0.00,
-    estado_prestamo VARCHAR(20) DEFAULT 'Activo' -- 'Activo', 'Devuelto', 'En Moroso'
+    estado_prestamo VARCHAR(20) DEFAULT 'Activo',-- 'Activo', 'Devuelto', 'En Moroso',
+    foreign key (id_usuario) references usuarios(id_usuario),
+    foreign key (id_libro) references libros(id_libro)
 );
 
+--  Tablas que no se consideraron en modelo ER
 -- 5. Variables Globales y Configuración 
 CREATE TABLE configuracion_sistema (
     clave VARCHAR(50) PRIMARY KEY,
