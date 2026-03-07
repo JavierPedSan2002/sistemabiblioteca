@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * ENTIDAD USUARIOS: GESTIÓN DE CUENTAS Y ACCESO
- * Define la estructura de los perfiles que interactúan con la biblioteca,
- * cumpliendo con los requerimientos de registro y seguridad (RF-01 al RF-04).
+ * ENTIDAD USUARIOS: ACTUALIZADA PARA biblioteca_universidad
+ * Ajustada para coincidir con el script SQL de Ricardo.
  */
 @Entity
 @Table(name = "usuarios")
@@ -14,51 +13,31 @@ public class Usuarios {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "id_usuario") // CAMBIO: Antes decía "id"
+    private Integer id; // CAMBIO: Antes era Long, ahora es Integer para el SQL
 
     @Column(name = "nombre_completo", nullable = false)
     private String nombreCompleto;
 
-    /**
-     * @Column(unique = true): Garantiza que no existan dos cuentas con el mismo correo,
-     * cumpliendo con la restricción de integridad del RF-01.
-     */
     @Column(name = "correo_electronico", unique = true, nullable = false)
     private String correoElectronico;
 
-    /**
-     * RF-01 SEGURIDAD: Almacenamos el hash de la contraseña, no el texto plano,
-     * siguiendo las mejores prácticas de ciberseguridad industrial.
-     */
     @Column(name = "password_hash", nullable = false)
     private String passwordHash; 
 
-    /**
-     * GESTIÓN DE ROLES: Vincula al usuario con su nivel de permiso.
-     * 1: Estudiante, 2: Profesor, 3: Bibliotecario (RF-01).
-     */
     @Column(name = "id_rol")
     private Integer idRol; 
 
-    /**
-     * @Column(updatable = false): Registra el momento exacto de la creación
-     * y protege este dato para que no sea modificado posteriormente.
-     */
-    @Column(name = "fecha_registro", updatable = false)
+    @Column(name = "fecha_registro", updatable = false, insertable = false)
     private LocalDateTime fechaRegistro;
 
-    /**
-     * ELIMINACIÓN LÓGICA: TRUE representa una cuenta habilitada,
-     * FALSE representa una cuenta desactivada (RF-04).
-     */
+    @Column(name = "estado")
     private Boolean estado; 
 
-    // --- MÉTODOS DE ACCESO (GETTERS Y SETTERS) ---
-    // Estándares de encapsulamiento para la comunicación entre capas.
+    // --- MÉTODOS DE ACCESO ACTUALIZADOS ---
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getNombreCompleto() { return nombreCompleto; }
     public void setNombreCompleto(String nombreCompleto) { this.nombreCompleto = nombreCompleto; }

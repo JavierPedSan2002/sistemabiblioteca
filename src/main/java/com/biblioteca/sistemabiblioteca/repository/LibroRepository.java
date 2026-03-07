@@ -7,32 +7,30 @@ import java.util.List;
 
 /**
  * CAPA DE REPOSITORIO: INTERFAZ DE PERSISTENCIA PARA LIBROS
- * Proporciona acceso a la base de datos MySQL mediante Spring Data JPA.
+ * Actualizada para coincidir con el campo 'idLibro'.
  */
 @Repository
 public interface LibroRepository extends JpaRepository<Libro, String> { 
 
     /**
      * RF-06: BÚSQUEDA POR TÍTULO
-     * Permite encontrar libros aunque el usuario no escriba el nombre completo (Like).
      */
     List<Libro> findByTituloContainingIgnoreCase(String titulo);
 
     /**
      * RF-06: BÚSQUEDA POR AUTOR
-     * Filtra el catálogo por el nombre del escritor.
      */
     List<Libro> findByAutorContainingIgnoreCase(String autor);
 
     /**
      * RF-07: FILTRADO POR CATEGORÍA
-     * Útil para agrupar libros del mismo género (Novela, Ciencia, etc.).
      */
     List<Libro> findByCategoria(String categoria);
 
     /**
      * VALIDACIÓN DE EXISTENCIA
-     * Método interno para verificar si un ISBN ya está registrado.
+     * CAMBIO: Se actualiza de existsByIsbn a existsByIdLibro para que coincida 
+     * con el nombre de la variable en el Modelo Libro.
      */
-    boolean existsByIsbn(String isbn);
+    boolean existsByIdLibro(String idLibro);
 }

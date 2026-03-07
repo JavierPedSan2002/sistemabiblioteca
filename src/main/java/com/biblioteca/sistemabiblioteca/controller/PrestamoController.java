@@ -10,13 +10,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * CAPA DE CONTROLADOR PARA PRÉSTAMOS
- * Este componente gestiona el ciclo de vida de los préstamos, desde la salida 
- * del libro hasta su devolución (RF-09 al RF-11).
+ * CAPA DE CONTROLADOR PARA PRÉSTAMOS - ACTUALIZADO PARA biblioteca_universidad
+ * Gestiona el ciclo de vida de los préstamos (RF-09 al RF-11).
  */
 @RestController
 @RequestMapping("/api/prestamos")
-@CrossOrigin(origins = "*") // Habilita la interoperabilidad con clientes externos (JavaFX/Python).
+@CrossOrigin(origins = "*") 
 public class PrestamoController {
 
     @Autowired
@@ -27,19 +26,15 @@ public class PrestamoController {
 
     /**
      * RF-09: REGISTRO DE PRÉSTAMO CON VALIDACIÓN
-     * Procesa la solicitud de un préstamo. No se guarda directamente, sino que 
-     * pasa por el 'Service' para validar reglas críticas (ej. límite de libros).
      */
     @PostMapping
     public Prestamo crearPrestamo(@RequestBody Prestamo prestamo) {
-        // Delegamos la lógica al servicio para asegurar que el usuario esté habilitado.
         return prestamoService.registrarPrestamo(prestamo);
     }
 
     /**
      * RF-11: HISTORIAL Y LISTADO
-     * Expone todos los registros de préstamos para auditoría y reportes.
-     * Útil para que la herramienta de Python analice tendencias de lectura.
+     * Expone datos para la herramienta de Python de Ricardo.
      */
     @GetMapping
     public List<Prestamo> listarPrestamos() {
@@ -48,21 +43,21 @@ public class PrestamoController {
 
     /**
      * RF-10: REGISTRO DE DEVOLUCIÓN
-     * Actualiza el estado de un préstamo activo.
-     * @param id Identificador único del préstamo a cerrar.
-     * Captura la fecha y hora exacta de la devolución de forma automática.
+     * Se actualiza para coincidir con los estados definidos en el script SQL ('Devuelto').
      */
     @PutMapping("/{id}/devolver")
-    public Prestamo devolverLibro(@PathVariable Long id) {
-        // Buscamos el registro activo en la base de datos MySQL.
+    public Prestamo devolverLibro(@PathVariable Integer id) { // Cambiado a Integer por el script SQL
+        // Buscamos el registro mediante la PK id_prestamo
         Prestamo prestamo = prestamoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Préstamo no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Préstamo no encontrado con ID: " + id));
         
-        // Seteamos la fecha actual y cambiamos el estado para liberar el libro.
+        // Seteamos fecha real de devolución (TIMESTAMP en SQL)
         prestamo.setFechaDevolucionReal(LocalDateTime.now());
-        prestamo.setEstado("Devuelto");
         
-        // Persistimos el cambio mediante el repositorio.
+        // IMPORTANTE: El script de Ricardo usa 'estado_prestamo'. 
+        // Asegúrate que en el modelo el setter se llame setEstadoPrestamo o esté mapeado correctamente.
+        prestamo.setEstadoPrestamo("Devuelto");
+        
         return prestamoRepository.save(prestamo);
     }
 }

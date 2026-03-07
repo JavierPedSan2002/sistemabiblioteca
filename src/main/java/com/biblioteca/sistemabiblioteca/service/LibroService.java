@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * CAPA DE SERVICIO: GESTIÓN DE INVENTARIO
+ * CAPA DE SERVICIO: GESTIÓN DE INVENTARIO - ACTUALIZADO
  * Centraliza las reglas de negocio para el catálogo de libros.
  */
 @Service
@@ -17,20 +17,18 @@ public class LibroService {
     private LibroRepository libroRepository;
 
     /**
-     * RF-05: REGISTRO DE LIBROS CON VALIDACIÓN DE ISBN
-     * Corrige el error de comparación null para tipos primitivos int.
+     * RF-05: REGISTRO DE LIBROS CON VALIDACIÓN DE ID_LIBRO
      */
     @Transactional
     public Libro registrarLibro(Libro libro) {
-        // 1. Validación de existencia
-        if (libroRepository.existsById(libro.getIsbn())) {
-            throw new RuntimeException("ERROR RF-05: Ya existe un libro registrado con el ISBN: " + libro.getIsbn());
+        // 1. Validación de existencia usando el nuevo nombre de campo idLibro
+        if (libroRepository.existsById(libro.getIdLibro())) {
+            throw new RuntimeException("ERROR RF-05: Ya existe un libro registrado con el ID: " + libro.getIdLibro());
         }
 
-        // 2. Validación de consistencia
-        // Eliminamos la comparación == null porque copiasDisponibles es un 'int'
+        // 2. Validación de consistencia de stock
         if (libro.getCopiasDisponibles() < 0) {
-            libro.setCopiasDisponibles(0); // Asegura que no haya stock negativo al registrar
+            libro.setCopiasDisponibles(0); 
         }
 
         // 3. Persistencia
@@ -39,16 +37,20 @@ public class LibroService {
 
     /**
      * RF-08: ACTUALIZACIÓN DE DATOS DEL LIBRO
+     * Se cambia el parámetro 'isbn' por 'idLibro' para ser consistentes con la BD.
      */
     @Transactional
-    public Libro actualizarLibro(String isbn, Libro libroActualizado) {
-        return libroRepository.findById(isbn)
+    public Libro actualizarLibro(String idLibro, Libro libroActualizado) {
+        return libroRepository.findById(idLibro)
             .map(libro -> {
                 libro.setTitulo(libroActualizado.getTitulo());
                 libro.setAutor(libroActualizado.getAutor());
+                libro.setEditorial(libroActualizado.getEditorial()); // Agregado para integridad
+                libro.setAnioPublicacion(libroActualizado.getAnioPublicacion()); // Agregado para integridad
+                libro.setCategoria(libroActualizado.getCategoria()); // Agregado para integridad
                 libro.setUbicacionEstanteria(libroActualizado.getUbicacionEstanteria());
                 
-                // Validación extra al actualizar stock
+                // Validación de stock
                 if (libroActualizado.getCopiasDisponibles() < 0) {
                     throw new RuntimeException("No se puede asignar un stock negativo.");
                 }
@@ -56,6 +58,6 @@ public class LibroService {
                 libro.setCopiasDisponibles(libroActualizado.getCopiasDisponibles());
                 return libroRepository.save(libro);
             })
-            .orElseThrow(() -> new RuntimeException("Libro no encontrado para actualizar con ISBN: " + isbn));
+            .orElseThrow(() -> new RuntimeException("Libro no encontrado para actualizar con ID: " + idLibro));
     }
 }

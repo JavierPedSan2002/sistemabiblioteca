@@ -3,11 +3,11 @@ package com.biblioteca.sistemabiblioteca.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 /**
- * ENTIDAD PRESTAMO: EL NÚCLEO TRANSACCIONAL
- * Esta clase vincula a los Usuarios con los Libros, representando el proceso 
- * principal de la biblioteca (RF-09 al RF-11).
+ * ENTIDAD PRESTAMO: ACTUALIZADA PARA biblioteca_universidad
+ * Vincula Usuarios con Libros usando la estructura de Ricardo.
  */
 @Entity
 @Table(name = "prestamos")
@@ -16,64 +16,39 @@ public class Prestamo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_prestamo")
-    private Long id;
+    private Integer id; // Cambiado de Long a Integer para coincidir con el INT de MySQL
 
-    /**
-     * @ManyToOne: Relación muchos a uno. 
-     * Muchos préstamos pueden referenciar al mismo Libro mediante su ISBN.
-     */
     @ManyToOne
-    @JoinColumn(name = "isbn") 
+    @JoinColumn(name = "id_libro") // Cambiado de 'isbn' a 'id_libro'
     private Libro libro;
 
-    /**
-     * @ManyToOne: Relación con la tabla Usuarios. 
-     * Identifica al socio (alumno/docente) que solicita el material.
-     */
     @ManyToOne
     @JoinColumn(name = "id_usuario") 
     private Usuarios usuario;
 
-    /**
-     * RF-09: AUDITORÍA DE ENTREGA
-     * Relación que identifica al bibliotecario responsable de procesar la salida.
-     */
     @ManyToOne
     @JoinColumn(name = "id_bibliotecario_entrega") 
     private Usuarios bibliotecario;
 
-    @Column(name = "fecha_salida")
+    @Column(name = "fecha_salida", insertable = false, updatable = false)
     private LocalDateTime fechaPrestamo; 
 
-    /**
-     * RF-09: PLAZO DE ENTREGA
-     * Define la fecha límite para evitar sanciones (normalmente entre 7 y 15 días).
-     */
     @Column(name = "fecha_devolucion_esperada")
     private LocalDate fechaDevolucionEsperada; 
 
-    /**
-     * RF-10: CONTROL DE DEVOLUCIÓN
-     * Almacena el momento exacto en que el libro regresa físicamente.
-     */
     @Column(name = "fecha_devolucion_real")
     private LocalDateTime fechaDevolucionReal; 
 
     @Column(name = "monto_multa_generado")
-    private Double multa;
+    private BigDecimal multa; // BigDecimal es mejor para dinero (monto_multa en SQL)
 
-    /**
-     * ESTADO DEL PRÉSTAMO
-     * Gestiona el ciclo de vida: 'Activo', 'Devuelto' o 'Moroso'.
-     */
     @Column(name = "estado_prestamo")
-    private String estado;
+    private String estadoPrestamo; // Cambiado de 'estado' a 'estado_prestamo'
 
-    // --- MÉTODOS DE ACCESO (GETTERS Y SETTERS) ---
-    // Proporcionan la interfaz necesaria para que el Service y el Controller manipulen los datos.
+    // --- MÉTODOS DE ACCESO ACTUALIZADOS ---
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public Libro getLibro() { return libro; }
     public void setLibro(Libro libro) { this.libro = libro; }
@@ -93,9 +68,10 @@ public class Prestamo {
     public LocalDateTime getFechaDevolucionReal() { return fechaDevolucionReal; }
     public void setFechaDevolucionReal(LocalDateTime fechaDevolucionReal) { this.fechaDevolucionReal = fechaDevolucionReal; }
 
-    public Double getMulta() { return multa; }
-    public void setMulta(Double multa) { this.multa = multa; }
+    public BigDecimal getMulta() { return multa; }
+    public void setMulta(BigDecimal multa) { this.multa = multa; }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    // Este es el método que tu controlador buscaba y no encontraba:
+    public String getEstadoPrestamo() { return estadoPrestamo; }
+    public void setEstadoPrestamo(String estadoPrestamo) { this.estadoPrestamo = estadoPrestamo; }
 }

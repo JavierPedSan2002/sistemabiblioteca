@@ -6,52 +6,45 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * CAPA DE MODELO: ENTIDAD LIBRO
- * Esta clase representa la tabla 'libros' en la base de datos. 
- * Es un POJO (Plain Old Java Object) que utiliza JPA para el mapeo objeto-relacional (ORM).
+ * CAPA DE MODELO: ENTIDAD LIBRO - ACTUALIZADA
+ * Alineada con la tabla 'libros' de la base de datos de Ricardo.
  */
 @Entity
 @Table(name = "libros")
 public class Libro {
 
-    /**
-     * @Id: Define el ISBN como la llave primaria natural de la tabla.
-     * Se ha configurado con una longitud de 20 caracteres para cumplir con los estándares internacionales de ISBN-10 y ISBN-13.
-     */
     @Id
     @Column(name = "id_libro", length = 20)
-    private String isbn; 
+    private String idLibro; // CAMBIO: Se renombra de 'isbn' a 'idLibro' para ser consistentes
 
     @Column(nullable = false)
     private String titulo;
 
+    @Column(nullable = false) // Ricardo lo puso como NOT NULL en el script
     private String autor;
+
     private String editorial;
 
-    /**
-     * @Column: Sincroniza el nombre del atributo en Java con la columna física en MySQL.
-     */
     @Column(name = "anio_publicacion")
-    private int anioPublicacion;
+    private Integer anioPublicacion; // Cambiado a Integer para permitir nulos si es necesario
 
     @Column(name = "categoria")
     private String categoria; 
 
-    @Column(name = "copias_disponibles")
+    @Column(name = "copias_disponibles", nullable = false)
     private int copiasDisponibles;
 
     @Column(name = "ubicacion_estanteria")
     private String ubicacionEstanteria;
 
-    // --- MÉTODOS DE ACCESO (GETTERS Y SETTERS) ---
-    // Permiten la encapsulación de los datos y su correcta manipulación por los frameworks.
+    // --- MÉTODOS DE ACCESO ACTUALIZADOS ---
 
-    public String getIsbn() {
-        return isbn;
+    public String getIdLibro() {
+        return idLibro;
     }
 
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
+    public void setIdLibro(String idLibro) {
+        this.idLibro = idLibro;
     }
 
     public String getTitulo() {
@@ -78,11 +71,11 @@ public class Libro {
         this.editorial = editorial;
     }
 
-    public int getAnioPublicacion() {
+    public Integer getAnioPublicacion() {
         return anioPublicacion;
     }
 
-    public void setAnioPublicacion(int anioPublicacion) {
+    public void setAnioPublicacion(Integer anioPublicacion) {
         this.anioPublicacion = anioPublicacion;
     }
 

@@ -6,22 +6,22 @@ import org.springframework.stereotype.Repository;
 import java.util.List; 
 
 @Repository
-public interface PrestamoRepository extends JpaRepository<Prestamo, Long> {
+public interface PrestamoRepository extends JpaRepository<Prestamo, Integer> { // Cambiado a Integer
     
     /**
      * RF-11: FILTRADO POR ESTADO
-     * Ajustado para coincidir con el atributo 'private String estado' de Prestamo.java
+     * Ajustado para 'estadoPrestamo' (nombre en el modelo nuevo)
      */
-    List<Prestamo> findByEstado(String estado);
+    List<Prestamo> findByEstadoPrestamo(String estadoPrestamo);
     
     /**
      * RF-09: VALIDACIÓN DE LÍMITE DE 3 LIBROS
-     * Cuenta préstamos no devueltos (fechaDevolucionReal es null).
+     * Se ajusta para usar el objeto usuario y el ID como Integer.
      */
-    long countByUsuarioIdAndFechaDevolucionRealIsNull(Long idUsuario);
+    long countByUsuarioIdAndFechaDevolucionRealIsNull(Integer idUsuario);
 
     /**
      * HISTORIAL POR USUARIO
      */
-    List<Prestamo> findByUsuarioId(Long idUsuario);
+    List<Prestamo> findByUsuarioId(Integer idUsuario);
 }

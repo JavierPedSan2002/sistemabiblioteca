@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * CAPA DE CONTROLADOR (API REST)
- * Esta clase actúa como el punto de entrada al sistema para todas las operaciones
- * relacionadas con la gestión de libros (RF-05 al RF-08).
+ * CAPA DE CONTROLADOR (API REST) - ACTUALIZADO PARA biblioteca_universidad
+ * Punto de entrada para la gestión de libros (RF-05 al RF-08).
  */
 @RestController
 @RequestMapping("/api/libros")
-@CrossOrigin(origins = "*") // Permite la conexión con el Frontend (JavaFX) evitando bloqueos de seguridad.
+@CrossOrigin(origins = "*") 
 public class LibroController {
 
     @Autowired
@@ -26,19 +25,15 @@ public class LibroController {
 
     /**
      * RF-05: REGISTRO DE LIBROS
-     * Recibe un objeto Libro en formato JSON y delega la persistencia a la capa de servicio.
-     * Se usa @PostMapping para seguir las convenciones de creación de recursos en API REST.
+     * Ahora utiliza el modelo alineado con la tabla 'libros'.
      */
     @PostMapping
     public Libro crearLibro(@RequestBody Libro libro) {
-        // Se utiliza el servicio para garantizar que se apliquen reglas de negocio antes de guardar.
         return libroService.registrarLibro(libro);
     }
 
     /**
      * RF-07: CONSULTA DE CATÁLOGO
-     * Retorna una lista completa de los libros almacenados en la base de datos MySQL.
-     * Es fundamental para que el bibliotecario pueda visualizar el inventario actual.
      */
     @GetMapping
     public List<Libro> listarLibros() {
@@ -46,13 +41,12 @@ public class LibroController {
     }
 
     /**
-     * RF-08: BÚSQUEDA ESPECÍFICA
-     * Permite localizar un libro mediante su identificador único (ISBN).
-     * Si el libro no existe, lanza una excepción controlada para evitar fallos en el sistema.
+     * RF-08: BÚSQUEDA ESPECÍFICA POR ID_LIBRO
+     * Se actualiza el parámetro para coincidir con la llave primaria del nuevo script.
      */
-    @GetMapping("/{isbn}")
-    public Libro obtenerPorIsbn(@PathVariable String isbn) {
-        return libroRepository.findById(isbn)
-                .orElseThrow(() -> new RuntimeException("Libro no encontrado con ISBN: " + isbn));
+    @GetMapping("/{idLibro}")
+    public Libro obtenerPorId(@PathVariable String idLibro) {
+        return libroRepository.findById(idLibro)
+                .orElseThrow(() -> new RuntimeException("Libro no encontrado con ID: " + idLibro));
     }
 }

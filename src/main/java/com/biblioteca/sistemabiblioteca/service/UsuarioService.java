@@ -5,7 +5,6 @@ import com.biblioteca.sistemabiblioteca.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -16,22 +15,26 @@ public class UsuarioService {
 
     /**
      * RF-01: Registro de usuarios con validación de correo único.
+     * El estado se inicializa en true (activo).
      */
     @Transactional
     public Usuarios registrarUsuario(Usuarios usuario) {
         if(usuarioRepository.findByCorreoElectronico(usuario.getCorreoElectronico()).isPresent()) {
             throw new RuntimeException("El correo ya está registrado en el sistema.");
         }
-        usuario.setFechaRegistro(LocalDateTime.now());
+        
+        // El campo fechaRegistro no se setea manualmente aquí porque en la BD 
+        // de Ricardo tiene un DEFAULT CURRENT_TIMESTAMP.
         usuario.setEstado(true);
         return usuarioRepository.save(usuario);
     }
 
     /**
-     * RF-03: Actualización sincronizada con el modelo Usuarios.java
+     * RF-03: Actualización sincronizada.
+     * CAMBIO: Se usa Integer para el ID.
      */
     @Transactional
-    public Usuarios actualizarUsuario(Long id, Usuarios datosNuevos) {
+    public Usuarios actualizarUsuario(Integer id, Usuarios datosNuevos) {
         return usuarioRepository.findById(id)
             .map(usuario -> {
                 usuario.setNombreCompleto(datosNuevos.getNombreCompleto());
@@ -44,9 +47,10 @@ public class UsuarioService {
 
     /**
      * RF-04: Baja lógica del usuario.
+     * CAMBIO: Se usa Integer para el ID.
      */
     @Transactional
-    public void eliminarUsuario(Long id) {
+    public void eliminarUsuario(Integer id) {
         Usuarios usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no existe."));
         usuario.setEstado(false);

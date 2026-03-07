@@ -15,24 +15,27 @@ public class PrestamoService {
     private PrestamoRepository prestamoRepository;
 
     @Autowired
-    private LibroRepository libroRepository; // Agregado para validar stock [cite: 54, 64]
+    private LibroRepository libroRepository;
 
     /**
      * RF-09: Registro de préstamos con validación de límite y stock.
+     * Actualizado para la estructura de IDs tipo Integer.
      */
     @Transactional
     public Prestamo registrarPrestamo(Prestamo prestamo) {
         
         // 1. VALIDACIÓN: Máximo 3 libros activos por usuario 
-        Long usuarioId = prestamo.getUsuario().getId();
+        // Cambiado a Integer para coincidir con el nuevo modelo de Usuarios
+        Integer usuarioId = prestamo.getUsuario().getId();
         long prestamosActivos = prestamoRepository.countByUsuarioIdAndFechaDevolucionRealIsNull(usuarioId);
         
         if (prestamosActivos >= 3) {
             throw new RuntimeException("RESTRICCIÓN RF-09: El usuario ya tiene 3 libros activos.");
         }
 
-        // 2. VALIDACIÓN: Disponibilidad de copias (Mínimo 3 por default) [cite: 49, 64]
-        Libro libro = libroRepository.findById(prestamo.getLibro().getIsbn())
+        // 2. VALIDACIÓN: Disponibilidad de copias
+        // Cambiado getIsbn() por getIdLibro() según la nueva entidad Libro
+        Libro libro = libroRepository.findById(prestamo.getLibro().getIdLibro())
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado en el catálogo."));
 
         if (libro.getCopiasDisponibles() <= 0) {
@@ -43,7 +46,8 @@ public class PrestamoService {
         libro.setCopiasDisponibles(libro.getCopiasDisponibles() - 1);
         libroRepository.save(libro);
 
-        // 4. GUARDAR: Registro del préstamo
+        // 4. GUARDAR: Registro del préstamo con estado inicial
+        prestamo.setEstadoPrestamo("Activo");
         return prestamoRepository.save(prestamo);
     }
 }
