@@ -278,4 +278,25 @@ def estado_prestamos(conn=Depends(get_conn)):
         return rows
     finally:
         cur.close()
-        
+# --- BIBLIOTECARIOS QUE MÁS PRÉSTAMOS REGISTRAN ---
+@app.get("/reportes/bibliotecarios-mas-prestamos")
+def bibliotecarios_mas_prestamos(conn=Depends(get_conn)):
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            SELECT
+                b.id_usuario,
+                b.nombre_completo AS bibliotecario,
+                COUNT(*) AS total_prestamos_registrados
+            FROM prestamos p
+            JOIN usuarios b ON p.id_bibliotecario_entrega = b.id_usuario
+            GROUP BY b.id_usuario, b.nombre_completo
+            ORDER BY total_prestamos_registrados DESC;
+        """)
+
+        columns = [col[0] for col in cur.description]
+        rows = [dict(zip(columns, row)) for row in cur.fetchall()]
+        return rows
+
+    finally:
+        cur.close()
