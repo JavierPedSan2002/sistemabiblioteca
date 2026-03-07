@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * CONTROLADOR DE GESTIÓN DE USUARIOS - ACTUALIZADO PARA biblioteca_universidad
- * Centraliza las operaciones de administración de cuentas (RF-01 al RF-04).
+ * CONTROLADOR DE GESTIÓN DE USUARIOS - VERSIÓN FINAL
+ * Maneja el ciclo de vida de usuarios (RF-01 al RF-04 y actualizaciones).
  */
 @RestController
 @RequestMapping("/api/usuarios")
@@ -40,17 +40,49 @@ public class UsuarioController {
     }
 
     /**
+     * RF-03: BÚSQUEDA POR ID
+     */
+    @GetMapping("/{id}")
+    public Usuarios obtenerUsuario(@PathVariable Integer id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario con ID " + id + " no encontrado"));
+    }
+
+    /**
+     * ACTUALIZACIÓN DE DATOS (NUEVO)
+     * Permite editar nombre, correo, rol o estado.
+     */
+    @PutMapping("/{id}")
+    public Usuarios actualizarUsuario(@PathVariable Integer id, @RequestBody Usuarios datosNuevos) {
+        return usuarioRepository.findById(id)
+            .map(usuario -> {
+                usuario.setNombreCompleto(datosNuevos.getNombreCompleto());
+                usuario.setCorreoElectronico(datosNuevos.getCorreoElectronico());
+                usuario.setIdRol(datosNuevos.getIdRol());
+                usuario.setEstado(datosNuevos.getEstado()); 
+                return usuarioRepository.save(usuario);
+            })
+            .orElseThrow(() -> new RuntimeException("No se encontró el usuario con ID: " + id));
+    }
+
+    /**
      * RF-04: ELIMINACIÓN LÓGICA (DESACTIVACIÓN)
-     * Actualizado: El ID ahora se maneja como Integer para ser compatible con el script SQL.
      */
     @PutMapping("/{id}/desactivar")
-    public Usuarios desactivarUsuario(@PathVariable Integer id) { // CAMBIO: Long -> Integer
-        // Verificamos la existencia usando la nueva llave primaria id_usuario (mapeada en el modelo)
+    public Usuarios desactivarUsuario(@PathVariable Integer id) {
         Usuarios usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario con ID " + id + " no existe"));
         
-        // Cambio de estado para restricción de privilegios sin pérdida de datos históricos.
         usuario.setEstado(false); 
         return usuarioRepository.save(usuario);
+    }
+
+    /**
+     * ELIMINACIÓN FÍSICA
+     * Solo para registros sin historial de préstamos.
+     */
+    @DeleteMapping("/{id}")
+    public void eliminarUsuario(@PathVariable Integer id) {
+        usuarioRepository.deleteById(id);
     }
 }

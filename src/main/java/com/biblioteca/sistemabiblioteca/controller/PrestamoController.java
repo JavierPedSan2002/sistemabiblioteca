@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * CAPA DE CONTROLADOR PARA PRÉSTAMOS - ACTUALIZADO PARA biblioteca_universidad
- * Gestiona el ciclo de vida de los préstamos (RF-09 al RF-11).
+ * CAPA DE CONTROLADOR PARA PRÉSTAMOS - VERSIÓN FINAL
+ * Gestiona el ciclo de vida completo: Registro, Devolución, Edición y Eliminación.
  */
 @RestController
 @RequestMapping("/api/prestamos")
@@ -34,7 +34,6 @@ public class PrestamoController {
 
     /**
      * RF-11: HISTORIAL Y LISTADO
-     * Expone datos para la herramienta de Python de Ricardo.
      */
     @GetMapping
     public List<Prestamo> listarPrestamos() {
@@ -42,22 +41,43 @@ public class PrestamoController {
     }
 
     /**
-     * RF-10: REGISTRO DE DEVOLUCIÓN
-     * Se actualiza para coincidir con los estados definidos en el script SQL ('Devuelto').
+     * RF-10: REGISTRO DE DEVOLUCIÓN (Acción específica)
      */
     @PutMapping("/{id}/devolver")
-    public Prestamo devolverLibro(@PathVariable Integer id) { // Cambiado a Integer por el script SQL
-        // Buscamos el registro mediante la PK id_prestamo
+    public Prestamo devolverLibro(@PathVariable Integer id) {
         Prestamo prestamo = prestamoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Préstamo no encontrado con ID: " + id));
         
-        // Seteamos fecha real de devolución (TIMESTAMP en SQL)
         prestamo.setFechaDevolucionReal(LocalDateTime.now());
-        
-        // IMPORTANTE: El script de Ricardo usa 'estado_prestamo'. 
-        // Asegúrate que en el modelo el setter se llame setEstadoPrestamo o esté mapeado correctamente.
         prestamo.setEstadoPrestamo("Devuelto");
         
         return prestamoRepository.save(prestamo);
+    }
+
+    /**
+     * ACTUALIZACIÓN GENERAL DE PRÉSTAMO
+     * Útil para corregir fechas o estados manualmente.
+     */
+    @PutMapping("/{id}")
+    public Prestamo actualizarPrestamo(@PathVariable Integer id, @RequestBody Prestamo datosNuevos) {
+        return prestamoRepository.findById(id)
+            .map(prestamo -> {
+                prestamo.setFechaPrestamo(datosNuevos.getFechaPrestamo());
+                prestamo.setFechaDevolucionEsperada(datosNuevos.getFechaDevolucionEsperada());
+                prestamo.setEstadoPrestamo(datosNuevos.getEstadoPrestamo());
+                // No solemos cambiar el libro o usuario de un préstamo, 
+                // pero si es necesario, se agregarían aquí.
+                return prestamoRepository.save(prestamo);
+            })
+            .orElseThrow(() -> new RuntimeException("No se encontró el préstamo con ID: " + id));
+    }
+
+    /**
+     * ELIMINACIÓN DE PRÉSTAMO
+     * Para borrar registros accidentales.
+     */
+    @DeleteMapping("/{id}")
+    public void eliminarPrestamo(@PathVariable Integer id) {
+        prestamoRepository.deleteById(id);
     }
 }
